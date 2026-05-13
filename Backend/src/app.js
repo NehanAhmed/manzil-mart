@@ -7,9 +7,15 @@ const vendorRoutes = require("./routes/vendor.routes")
 const productRoutes = require("./routes/product.routes")
 const adminRoutes = require("./routes/admin.routes")
 const orderRoutes = require("./routes/order.routes")
+const cors = require("cors")
 // Middleware   
 app.use(express.json())
 app.use(cookieParser())
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    
+}))
+
 // ROUTES               
 const routePrefix = "/api/v1"
 app.use(`${routePrefix}/auth`, authRoutes)

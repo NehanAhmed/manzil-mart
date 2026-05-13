@@ -10,16 +10,37 @@ import {
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { useAuthLogin } from "@/hooks/useAuth"
+import { Controller, useForm } from "react-hook-form"
+import { loginSchema, type LoginFormValues } from "@/lib/validators/auth.validator"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 export function LoginForm({
   className,
   isVendor,
   ...props
 }: React.ComponentProps<"div"> & { isVendor?: boolean }) {
+
+  const { mutate: Login, isPending } = useAuthLogin()
+
+  const {control,handleSubmit,formState:{errors}} = useForm<LoginFormValues>({
+    resolver:zodResolver(loginSchema),
+    defaultValues:{
+      username:"",
+      email:"",
+      password:""
+    }
+  })
+
+  const onSubmit = (values: LoginFormValues) => {
+    Login(values)
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -30,15 +51,22 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="email-username">Email or Username</FieldLabel>
-                <Input
-                  id="email-username"
-                  type="text"
-                  placeholder="m@example.com or username"
-                  required
+                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <Controller
+                  name="email"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="email"
+                      type="text"
+                      placeholder="m@example.com"
+                      required
+                    />
+                  )}
                 />
               </Field>
               <Field>
@@ -51,10 +79,48 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Controller
+                  name="password"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="password"
+                      type="password"
+                      required
+                    />
+                  )}
+                />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                <FieldLabel>Username</FieldLabel>
+                <Controller 
+                  name="username"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="username"
+                      type="text"
+                        
+                    />
+                  )}
+                />
+              </Field>
+              {errors.username && (
+                <Field>
+                  <FieldError>{errors.username.message}</FieldError>
+                </Field>
+              )}
+              {errors.password && (
+                <Field>
+                  <FieldError>{errors.password.message}</FieldError>
+                </Field>
+              )}
+              <Field>
+                <Button type="submit" disabled={isPending}>
+                  {isPending ? "Logging in..." : "Login"}
+                </Button>
                 <FieldDescription className="text-center">
                   Don&apos;t have an account? <a href="/signup">Sign up</a>
                 </FieldDescription>
