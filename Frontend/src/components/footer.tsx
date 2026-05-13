@@ -1,4 +1,4 @@
-"use client";
+;
 
 import { 
   IconBrandFacebook, 
@@ -44,7 +44,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-background border-t">
+    <footer className="bg-background border-t mt-20">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           
@@ -134,27 +134,7 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Newsletter Section */}
-        <Card className="mt-12 bg-muted/50 border">
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div>
-                <h3 className="font-semibold text-foreground">Stay Updated</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Get the latest deals and fresh arrivals delivered to your inbox
-                </p>
-              </div>
-              <div className="flex w-full md:w-auto space-x-2">
-                <Input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="flex-1 md:w-64"
-                />
-                <Button>Subscribe</Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+    
 
         {/* Bottom Section */}
         <div className="mt-12 pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-4">

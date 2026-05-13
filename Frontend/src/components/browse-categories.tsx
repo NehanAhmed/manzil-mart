@@ -1,5 +1,5 @@
 // components/browse-categories.tsx
-"use client";
+;
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { motion } from "motion/react";

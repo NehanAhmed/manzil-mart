@@ -63,16 +63,11 @@ export function BestSelling({ products, onAddToCart, onClick }: BestSellingProps
                 delay: index * 0.06
               }}
             >
-              {/* Best seller badge */}
-              <Badge className="absolute top-3 left-3 z-10 rounded-full bg-orange-500 hover:bg-orange-500 text-white text-[10px] font-medium px-2 py-0.5 pointer-events-none">
-                <IconStar className="w-3 h-3 mr-1 fill-current" />
-                Best Seller
-              </Badge>
-              
               <ProductCard
                 product={product}
                 onAddToCart={onAddToCart}
                 onClick={onClick}
+                bestSeller={true}
               />
             </motion.div>
           ))}

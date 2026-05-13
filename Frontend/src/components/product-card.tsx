@@ -1,4 +1,4 @@
-"use client";
+;
 
 
 import { IconStar, IconPlus } from "@tabler/icons-react";
@@ -14,6 +14,7 @@ interface ProductCardProps {
   onAddToCart?: (product: Product) => void;
   onClick?: (product: Product) => void;
   className?: string;
+  bestSeller?: boolean;
 }
 
 export function ProductCard({
@@ -21,6 +22,7 @@ export function ProductCard({
   onAddToCart,
   onClick,
   className,
+  bestSeller = false,
 }: ProductCardProps) {
   return (
     <motion.div
@@ -33,14 +35,24 @@ export function ProductCard({
         onClick={() => onClick?.(product)}
         className={cn(
           "relative overflow-hidden cursor-pointer transition-shadow duration-200 hover:shadow-md",
-          className
+          className,
+          bestSeller && "border-2 border-orange-500"
         )}
       >
-        {product.discountPercent > 0 && (
-          <Badge className="absolute top-3 left-3 z-10 rounded-full bg-orange-500 hover:bg-orange-500 text-white text-[10px] font-medium px-2 py-0.5 pointer-events-none">
-            {product.discountPercent}% OFF
-          </Badge>
-        )}
+        <div className="flex justify-around items-center ">
+
+          {product.discountPercent > 0 && (
+            <Badge className="absolute top-3 left-3 z-10 rounded-full bg-orange-500 hover:bg-orange-500 text-white text-[10px] font-medium px-2 py-0.5 pointer-events-none">
+              {product.discountPercent}% OFF
+            </Badge>
+          )}
+
+          {bestSeller && (
+            <Badge className="absolute top-3 left-3 z-10 rounded-full bg-orange-500 hover:bg-orange-500 text-white text-[10px] font-medium px-2 py-0.5 pointer-events-none">
+              Best Seller
+            </Badge>
+          )}
+        </div>
 
         <CardContent className="p-4 flex flex-col gap-2.5">
           {/* Image */}

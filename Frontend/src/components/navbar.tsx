@@ -3,6 +3,12 @@ import React from 'react'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { Link } from 'react-router-dom'
+import { motion } from 'motion/react'
+const NavItems = [
+    {id:1,title:"Home",link:"/"},
+    {id:2,title:"Products",link:"/products"},
+    {id:3,title:"Become a Seller",link:"/vendor/register"},
+]
 const Navbar = () => {
     return (
         <header className=' w-full px-10 py-4 border-b-2'>
@@ -13,9 +19,21 @@ const Navbar = () => {
                 </div>
                 <div className='flex items-center justify-center gap-10'>
                     <div className='flex items-center justify-center gap-3'>
-                      <Link to="/"><p className='text-sm font-semibold'>Home</p></Link>
-                      <Link to="/products"><p className='text-sm font-semibold'>Products</p></Link>
-                      <Link to="/deals"><p className='text-sm font-semibold'>Deals</p></Link>
+                      {NavItems.map((item) => (
+                        <motion.div
+                          key={item.id}
+                          initial={{ y: 12, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={{ 
+                            type: "tween", 
+                            duration: 0.4, 
+                            ease: "easeOut",
+                            delay: item.id * 0.06
+                          }}
+                        >
+                          <Link to={item.link}><p className='text-sm font-semibold'>{item.title}</p></Link>
+                        </motion.div>
+                      ))}
                     </div>
                     <div className='min-w-112.5 relative'>
                         <IconSearch className='text-black/80 size-5 absolute left-4 top-1/2 transform -translate-y-1/2'/>
