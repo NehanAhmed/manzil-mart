@@ -65,14 +65,14 @@ const login = async (req, res) => {
             return res.status(400).json({ message: "Invalid password" });
         }
 
-        const token =jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "7d" })
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "7d" })
 
 
-res.cookie("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 7 * 24 * 60 * 60 * 1000
-})
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        })
         res.status(200).json({
             success: true,
             message: "User logged in successfully",
@@ -96,7 +96,7 @@ const logout = async (req, res) => {
 }
 const applyAsVendor = async (req, res) => {
     try {
-        const { storeName, storeDescription, phoneNumber } = req.body;
+        const { storeName, storeDescription, phoneNumber, storeType } = req.body;
         const token = req.user
         const ifUserExists = await userModel.findOne({
             _id: token.id
@@ -110,7 +110,8 @@ const applyAsVendor = async (req, res) => {
             user: ifUserExists._id,
             storeName,
             storeDescription,
-            phoneNumber
+            phoneNumber,
+            storeType
         })
 
         res.status(201).json({
@@ -125,11 +126,29 @@ const applyAsVendor = async (req, res) => {
     }
 }
 
+// fetchUser.js
+const fetchUser = async (req, res) => {
+    try {
+        const user = await userModel
+            .findById(req.user.id)
+            .select('-password -__v') // never expose sensitive fields
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' })
+        }
+
+        res.status(200).json({ success: true, user })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
 module.exports = {
     register,
     login,
     logout,
     applyAsVendor,
+    fetchUser,
     upload
 
 }

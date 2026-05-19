@@ -9,4 +9,5 @@ router.delete("/delete/:productId",authVendorMiddleware,productController.delete
 router.patch("/update/:productId",authVendorMiddleware,upload.array("files"),  productController.updateProduct)
 router.get("/fetch/:productId",productController.fetchProduct)
 router.get("/fetch",productController.fetchProducts)
+router.post("/filter",productController.getFilterProducts)
 module.exports = router

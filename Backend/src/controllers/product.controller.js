@@ -278,12 +278,71 @@ const fetchProducts = async (req, res) => {
     }
 }
 
+const getFilterProducts = async (req, res) => {
+  try {
+    const { category, query, page = 1, limit = 10 } = req.query
+
+    const pageNum = Math.max(1, parseInt(page))
+    const limitNum = Math.min(50, Math.max(1, parseInt(limit))) // cap at 50
+    const skip = (pageNum - 1) * limitNum
+
+    // Build filter dynamically
+    const filter = { status: 'active' }
+
+    if (category) filter.category = category
+
+    if (query) {
+      // Escape regex to prevent ReDoS
+      const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      filter.$or = [
+        { name: { $regex: escaped, $options: 'i' } },
+        { description: { $regex: escaped, $options: 'i' } },
+      ]
+    }
+
+    const [products, total] = await Promise.all([
+      productModel
+        .find(filter)
+        .skip(skip)
+        .limit(limitNum)
+        .select('name description price stock images category'),
+      productModel.countDocuments(filter),
+    ])
+
+    if (products.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No products found',
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Products fetched successfully',
+      products,
+      pagination: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum),
+      },
+    })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({
+      success: false,
+      message: 'An error occurred.',
+    })
+  }
+}
+
 module.exports = {
     createProduct,
     upload,
     deleteProduct,
     updateProduct,
     fetchProduct,
-    fetchProducts
+    fetchProducts,
+    getFilterProducts
 
 }

@@ -11,5 +11,6 @@ router.post("/logout",authControllers.logout)
 
 router.post('/apply',authMiddleware, authControllers.applyAsVendor)
 
+router.get('/user',authMiddleware, authControllers.fetchUser)
 
 module.exports = router

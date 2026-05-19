@@ -19,6 +19,7 @@ import { useAuthLogin } from "@/hooks/useAuth"
 import { Controller, useForm } from "react-hook-form"
 import { loginSchema, type LoginFormValues } from "@/lib/validators/auth.validator"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useNavigate } from "react-router"
 
 export function LoginForm({
   className,
@@ -27,18 +28,28 @@ export function LoginForm({
 }: React.ComponentProps<"div"> & { isVendor?: boolean }) {
 
   const { mutate: Login, isPending } = useAuthLogin()
+  const navigate = useNavigate()
 
-  const {control,handleSubmit,formState:{errors}} = useForm<LoginFormValues>({
-    resolver:zodResolver(loginSchema),
-    defaultValues:{
-      username:"",
-      email:"",
-      password:""
+  const { control, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      username: "",
+      email: "",
+      password: ""
     }
   })
 
   const onSubmit = (values: LoginFormValues) => {
-    Login(values)
+    Login(values, {
+      onSuccess: () => {
+        if(isVendor){
+          navigate("/apply-for-vendor")
+        }else{
+          navigate("/")
+        }
+      }
+    })
+   
   }
 
   return (
@@ -94,7 +105,7 @@ export function LoginForm({
               </Field>
               <Field>
                 <FieldLabel>Username</FieldLabel>
-                <Controller 
+                <Controller
                   name="username"
                   control={control}
                   render={({ field }) => (
@@ -102,7 +113,7 @@ export function LoginForm({
                       {...field}
                       id="username"
                       type="text"
-                        
+
                     />
                   )}
                 />

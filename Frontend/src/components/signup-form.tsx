@@ -8,6 +8,7 @@ import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { registerSchema, type RegisterFormValues } from "@/lib/validators/auth.validator"
 import { useAuthRegister } from "@/hooks/useAuth"
+import { useNavigate } from "react-router"
 
 export function SignupForm({
   className,
@@ -15,7 +16,7 @@ export function SignupForm({
   ...props
 }: React.ComponentProps<"div"> & { isVendor?: boolean }) {
   const { mutate: register, isPending } = useAuthRegister()
-
+  const navigate = useNavigate()
   const {
     control,
     handleSubmit,
@@ -41,7 +42,18 @@ export function SignupForm({
       formData.append("profilePicture", values.profilePicture[0])
     }
 
-    register(formData)
+    register(formData, {
+      onSuccess: () => {
+        if (isVendor) {
+          navigate('/vendor/login')
+        } else {
+          navigate("/login")
+        }
+      },
+      onError: (error) => {
+        console.error(error)
+      }
+    })
   }
 
   return (

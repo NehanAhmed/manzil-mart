@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router()
-const { loginAdmin, createAdmin, updateVendorStatus, logoutAdmin, fetchAllPendingVendors, fetchAllVendors, fetchAllProducts, fetchAllOrders } = require("../controllers/admin.controller")
+const { loginAdmin, createAdmin, updateVendorStatus, logoutAdmin, fetchAllPendingVendors, fetchAllVendors, fetchAllProducts, fetchAllOrders, getDashboardStats } = require("../controllers/admin.controller")
 const { authAdminMiddleware } = require("../middlewares/admin.middleware")
 
 router.post("/login", loginAdmin)
@@ -11,5 +11,6 @@ router.get("/fetch-all-pending-vendors", authAdminMiddleware, fetchAllPendingVen
 router.get("/fetch-all-vendors", authAdminMiddleware, fetchAllVendors)
 router.get("/fetch-all-products", authAdminMiddleware, fetchAllProducts)
 router.get("/fetch-all-orders", authAdminMiddleware, fetchAllOrders)
+router.get("/dashboard-stats", authAdminMiddleware, getDashboardStats)
 
 module.exports = router

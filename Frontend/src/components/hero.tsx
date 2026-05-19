@@ -12,7 +12,7 @@ const Hero = () => {
             <Badge variant={'outline'} className="w-fit text-white">
               <IconLeaf className="mr-1" /> Farm-Fresh & Organic
             </Badge>
-            <h1 className="text-5xl font-bold text-white">
+            <h1 className="text-5xl font-medium leading-13 tracking-tight text-white font-heading">
               Nourish your home <br /> with Earth's finest
             </h1>
             <p className="text-md max-w-md text-white/90">
@@ -37,7 +37,7 @@ const Hero = () => {
     style={{ backgroundImage: 'url("/Images/hero-image.jpeg")' }}
   />
   {/* Rendered after image in DOM = naturally on top */}
-  <div className="absolute inset-0 bg-linear-to-r from-black/80 via-black/40 to-transparent" />
+  <div className="absolute inset-0 bg-linear-to-r from-black/85 via-black/60 via-100% to-transparent" />
 </div>  
       </Card>
     </section>

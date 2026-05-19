@@ -8,6 +8,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import type { Product } from "@/types/product.types";
+import AddToCartButton from "./add-to-cart-button";
+import { useNavigate } from "react-router-dom";
 
 interface ProductCardProps {
   product: Product;
@@ -15,21 +17,30 @@ interface ProductCardProps {
   onClick?: (product: Product) => void;
   className?: string;
   bestSeller?: boolean;
+  isOnProductCard?: boolean;
 }
 
 export function ProductCard({
+
   product,
-  onAddToCart,
   onClick,
   className,
   bestSeller = false,
+  isOnProductCard = false,
 }: ProductCardProps) {
+
+  const navigate = useNavigate();
+  
+  const handleRedirect = () => {
+    navigate(`/product/${product._id}`);
+  };
   return (
     <motion.div
       initial={{ y: 12, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: "tween", duration: 0.4, ease: "easeOut" }}
       whileHover={{ scale: 1.03 }}
+      onClick={handleRedirect}
     >
       <Card
         onClick={() => onClick?.(product)}
@@ -40,12 +51,12 @@ export function ProductCard({
         )}
       >
         <div className="flex justify-around items-center ">
-
+{/* 
           {product.discountPercent > 0 && (
             <Badge className="absolute top-3 left-3 z-10 rounded-full bg-orange-500 hover:bg-orange-500 text-white text-[10px] font-medium px-2 py-0.5 pointer-events-none">
               {product.discountPercent}% OFF
             </Badge>
-          )}
+          )} */}
 
           {bestSeller && (
             <Badge className="absolute top-3 left-3 z-10 rounded-full bg-orange-500 hover:bg-orange-500 text-white text-[10px] font-medium px-2 py-0.5 pointer-events-none">
@@ -58,7 +69,7 @@ export function ProductCard({
           {/* Image */}
           <div className="relative h-36 w-full">
             <img
-              src={product.image}
+              src={product.images?.[0] || ''}
               alt={product.name}
               className="object-contain w-full h-full"
               loading="lazy"
@@ -73,8 +84,8 @@ export function ProductCard({
           {/* Rating */}
           <div className="flex items-center gap-1">
             <IconStar className="size-3.5 fill-amber-400 text-amber-400" aria-hidden />
-            <span className="text-sm font-medium text-foreground">{product.rating}</span>
-            <span className="text-xs text-muted-foreground">({product.reviewCount})</span>
+            {/* <span className="text-sm font-medium text-foreground">{product.rating}</span> */}
+            {/* <span className="text-xs text-muted-foreground">({product.reviewCount})</span> */}
           </div>
 
           {/* Price + Add button */}
@@ -83,25 +94,13 @@ export function ProductCard({
               <span className="text-sm font-bold text-foreground">
                 ${product.price.toFixed(1)}
               </span>
-              <span className="text-xs text-muted-foreground">/{product.unit}</span>
+              <span className="text-xs text-muted-foreground">/{product.stock}</span>
               <span className="text-xs text-muted-foreground line-through">
-                ${product.originalPrice.toFixed(1)}
+                ${product.price}
               </span>
             </div>
 
-            <motion.div whileTap={{ scale: 0.90 }}>
-              <Button
-                size="icon"
-                className="rounded-full size-8 shrink-0 bg-orange-500 hover:bg-orange-600 text-white"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onAddToCart?.(product);
-                }}
-                aria-label={`Add ${product.name} to cart`}
-              >
-                <IconPlus className="size-4" aria-hidden />
-              </Button>
-            </motion.div>
+          <AddToCartButton item={product} isOnProductCard={isOnProductCard} />
           </div>
         </CardContent>
       </Card>

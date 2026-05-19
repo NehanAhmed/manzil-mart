@@ -1,14 +1,26 @@
 import type { Product } from "@/types/product.types";
 import { motion } from "motion/react";
 import { ProductCard } from "./product-card";
+import { Skeleton } from "./ui/skeleton";
 
 interface ProductGridProps {
   products: Product[];
-  onAddToCart?: (product: Product) => void;
   onProductClick?: (product: Product) => void;
+  isPending?: boolean;
 }
 
-const ProductGrid = ({ products, onAddToCart, onProductClick }: ProductGridProps) => {
+const productGridSkeleton = () =>{
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      {Array.from({ length: 10 }).map((_, index) => (
+        <Skeleton key={index} className="h-48 w-full" />
+      ))}
+    </div>
+  )
+}
+
+const ProductGrid = ({ products, onProductClick, isPending }: ProductGridProps) => {
+  if(isPending ) return productGridSkeleton()
   return (
     <div>
       {products.length === 0 ? (
@@ -22,7 +34,7 @@ const ProductGrid = ({ products, onAddToCart, onProductClick }: ProductGridProps
         >
           {products.map((product, index) => (
             <motion.div
-              key={product.id}
+              key={product._id}
               initial={{ y: 12, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ 
@@ -33,13 +45,13 @@ const ProductGrid = ({ products, onAddToCart, onProductClick }: ProductGridProps
               }}
             >
               <ProductCard
+                isOnProductCard={true}
                 product={product}
-                onAddToCart={onAddToCart}
                 onClick={onProductClick}
               />
             </motion.div>
           ))}
-        </motion.div>
+        </motion.div> 
       )}
     </div>
   )

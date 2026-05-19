@@ -25,5 +25,13 @@ export const loginSchema = z.object({
   username: z.string().optional(),
 })
 
+export const applyForVendorSchema = z.object({
+  storeName:z.string().min(3, "Store name must be at least 3 characters"),
+  storeDescription:z.string().min(3, "Store description must be at least 3 characters"),
+  phoneNumber:z.string().min(10, "Phone number must be at least 10 characters"),
+  storeType:z.string().min(3, "Store type must be at least 3 characters"),
+})
+
 export type RegisterFormValues = z.infer<typeof registerSchema>
 export type LoginFormValues = z.infer<typeof loginSchema>
+export type ApplyForVendorFormValues = z.infer<typeof applyForVendorSchema>

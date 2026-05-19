@@ -117,12 +117,14 @@ const updateVendorStatus = async (req, res) => {
         }
         const vendor = await vendorModel.findByIdAndUpdate(vendorId, { status }, { new: true });
 
-        const updateUserStatus = await userModel.findByIdAndUpdate(vendor.user, { role: 'vendor' }, { new: true });
-        if (!updateUserStatus) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found"
-            })
+        if (status === "approved") {
+            const updateUserStatus = await userModel.findByIdAndUpdate(vendor.user, { role: 'vendor' }, { new: true });
+            if (!updateUserStatus) {
+                return res.status(404).json({
+                    success: false,
+                    message: "User not found"
+                })
+            }
         }
         res.status(200).json({
             message: "Vendor status updated successfully.",
@@ -140,7 +142,7 @@ const updateVendorStatus = async (req, res) => {
 
 const fetchAllPendingVendors = async(req, res) => {
     try {
-        const vendors = await vendorModel.find({ status: 'pending' });
+        const vendors = await vendorModel.find({ status: 'pending' }).populate("user", "username email");
         res.status(200).json({
             message: "Pending vendors fetched successfully.",
             vendors
@@ -157,7 +159,7 @@ const fetchAllPendingVendors = async(req, res) => {
 
 const fetchAllVendors = async(req, res) => {
     try {
-        const vendors = await vendorModel.find({ status: { $ne: 'deleted' } });
+        const vendors = await vendorModel.find({ status: { $ne: 'deleted' } }).populate("user", "username email");
         res.status(200).json({
             message: "Vendors fetched successfully.",
             vendors
@@ -175,7 +177,10 @@ const fetchAllVendors = async(req, res) => {
 const fetchAllProducts = async(req, res) => {
     try {
         const {page=1,limit=10} = req.query;
-        const products = await productModel.find({ status: { $ne: 'deleted' } }).limit(limit).skip((page-1)*limit);
+        const products = await productModel.find({ status: { $ne: 'deleted' } })
+            .populate("vendor", "username email")
+            .limit(limit)
+            .skip((page-1)*limit);
         res.status(200).json({
             message: "Products fetched successfully.",
             products
@@ -193,7 +198,11 @@ const fetchAllProducts = async(req, res) => {
 const fetchAllOrders = async(req,res) => {
     try {
         const {page=1,limit=10} = req.query;
-        const orders = await orderModel.find().limit(limit).skip((page-1)*limit);
+        const orders = await orderModel.find()
+            .populate("customer", "username email")
+            .populate("items.product", "name images")
+            .limit(limit)
+            .skip((page-1)*limit);
         res.status(200).json({
             message: "Orders fetched successfully.",
             orders
@@ -208,6 +217,63 @@ const fetchAllOrders = async(req,res) => {
     }
 }
 
+const getDashboardStats = async (req, res) => {
+    try {
+        const [
+            totalUsers,
+            totalVendors,
+            pendingVendors,
+            totalProducts,
+            totalOrders,
+            revenueResult,
+            recentOrders,
+            recentPendingVendors,
+        ] = await Promise.all([
+            userModel.countDocuments({ role: "user" }),
+            vendorModel.countDocuments({ status: "approved" }),
+            vendorModel.countDocuments({ status: "pending" }),
+            productModel.countDocuments(),
+            orderModel.countDocuments(),
+            orderModel.aggregate([
+                { $match: { status: { $ne: "cancelled" } } },
+                { $group: { _id: null, total: { $sum: "$totalAmount" } } },
+            ]),
+            orderModel
+                .find()
+                .populate("customer", "username email")
+                .populate("items.product", "name images")
+                .sort({ createdAt: -1 })
+                .limit(5),
+            vendorModel
+                .find({ status: "pending" })
+                .populate("user", "username email")
+                .sort({ createdAt: -1 })
+                .limit(5),
+        ])
+
+        res.status(200).json({
+            message: "Dashboard stats fetched successfully.",
+            stats: {
+                totalUsers,
+                totalVendors,
+                pendingVendors,
+                totalProducts,
+                totalOrders,
+                totalRevenue: revenueResult[0]?.total ?? 0,
+            },
+            recentOrders,
+            recentPendingVendors,
+        })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message,
+        })
+    }
+}
+
 module.exports = {
     createAdmin,
     loginAdmin,
@@ -216,5 +282,6 @@ module.exports = {
     fetchAllPendingVendors,
     fetchAllVendors,
     fetchAllProducts,
-    fetchAllOrders
+    fetchAllOrders,
+    getDashboardStats,
 }
